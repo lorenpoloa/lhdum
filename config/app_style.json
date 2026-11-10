@@ -1,0 +1,31 @@
+{
+  "theme_name": "retro-cyberpunk",
+  "palette": {
+    "background": "#1e1e2e",
+    "surface": "#252538",
+    "surface_focus": "#313244",
+    "primary": "#89b4fa",
+    "secondary": "#cba6f7",
+    "accent": "#f38ba8",
+    "text": "#cdd6f4",
+    "text_muted": "#6c7086",
+    "border": "#45475a",
+    "border_focus": "#89b4fa",
+    "success": "#a6e3a1",
+    "warning": "#f9e2af",
+    "error": "#f38ba8"
+  },
+  "typography": {
+    "font_style": "bold"
+  },
+  "borders": {
+    "type": "round",
+    "panel_type": "solid"
+  },
+  "table": {
+    "row_odd_background": "#1e1e2e",
+    "row_even_background": "#181825",
+    "cursor_background": "#313244",
+    "cursor_foreground": "#89b4fa"
+  }
+}
