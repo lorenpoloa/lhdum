@@ -24,7 +24,7 @@ from src.controllers.user_manager import (
     UserManagerError,
     UserValidationError,
 )
-from src.utils.theme_loader import load_tcss_from_config
+from src.utils.theme_loader import build_textual_theme, load_tcss_from_config
 from src.views.widgets import LumFooter, RetroHeader, UserTable
 
 HELP_TEXT = """\
@@ -369,6 +369,13 @@ class MainScreen(App):
     def __init__(self) -> None:
         super().__init__()
         self.CSS = load_tcss_from_config()
+        # La misma paleta se registra como tema de Textual para que los
+        # componentes internos (command palette, ayuda, notificaciones...)
+        # usen los colores del JSON y no el tema por defecto.
+        theme = build_textual_theme()
+        if theme is not None and hasattr(self, "register_theme"):
+            self.register_theme(theme)
+            self.theme = theme.name
         self._users: list[dict[str, Any]] = []
         self._privileged = False
 
@@ -415,6 +422,21 @@ class MainScreen(App):
                 PrivilegeAlertModal(),
                 self._on_privilege_result,
             )
+
+    def get_system_commands(self, screen: Any):
+        """Oculta el selector de temas de Textual.
+
+        La apariencia la define ``config/app_style.json``; permitir cambiar a
+        otro tema solo desincronizaría los componentes internos de Textual.
+        """
+
+        get_commands = getattr(super(), "get_system_commands", None)
+        if get_commands is None:
+            return
+
+        for command in get_commands(screen):
+            if command.title.lower() != "theme":
+                yield command
 
     # ------------------------------------------------------------------
     # Carga y filtrado

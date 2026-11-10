@@ -169,6 +169,77 @@ def load_style_config(
     return config
 
 
+def _is_dark_color(color: str) -> bool:
+    """Estima si un color hexadecimal es oscuro (para el tema de Textual)."""
+
+    value = color.strip().lstrip("#")
+    if len(value) == 3:
+        value = "".join(char * 2 for char in value)
+    if len(value) != 6:
+        return True
+
+    try:
+        red, green, blue = (int(value[index : index + 2], 16) for index in (0, 2, 4))
+    except ValueError:
+        return True
+
+    return (0.299 * red + 0.587 * green + 0.114 * blue) < 128
+
+
+def build_textual_theme(config_path: str | Path | None = None) -> Any | None:
+    """Construye un tema nativo de Textual a partir de ``app_style.json``.
+
+    El TCSS generado por :func:`load_tcss_from_config` estiliza la pantalla
+    principal, pero los componentes internos de Textual (command palette,
+    panel de ayuda, notificaciones, scrollbars...) usan sus propias variables
+    de tema. Registrar la misma paleta como ``Theme`` mantiene toda la
+    aplicación visualmente coherente.
+
+    Args:
+        config_path: Ruta opcional al archivo de configuración.
+
+    Returns:
+        Una instancia de ``textual.theme.Theme``, o ``None`` si la versión de
+        Textual instalada no soporta temas (anterior a la 0.86).
+    """
+
+    try:
+        from textual.theme import Theme
+    except ImportError:
+        return None
+
+    config = load_style_config(config_path)
+    palette = config["palette"]
+    table = config["table"]
+
+    return Theme(
+        name=config.get("theme_name", "lum-tui"),
+        primary=palette["primary"],
+        secondary=palette["secondary"],
+        accent=palette["accent"],
+        warning=palette["warning"],
+        error=palette["error"],
+        success=palette["success"],
+        foreground=palette["text"],
+        background=palette["background"],
+        surface=palette["surface"],
+        panel=palette["surface_focus"],
+        dark=_is_dark_color(palette["background"]),
+        variables={
+            "border": palette["border"],
+            "border-focus": palette["border_focus"],
+            "text-muted": palette["text_muted"],
+            "surface-focus": palette["surface_focus"],
+            "footer-background": palette["surface"],
+            "footer-foreground": palette["text_muted"],
+            "footer-key-foreground": palette["primary"],
+            "block-cursor-background": table["cursor_background"],
+            "block-cursor-foreground": table["cursor_foreground"],
+            "block-cursor-text-style": "bold",
+        },
+    )
+
+
 def load_tcss_from_config(
     config_path: str | Path | None = None,
 ) -> str:

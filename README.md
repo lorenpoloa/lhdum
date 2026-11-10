@@ -115,7 +115,13 @@ Toda la apariencia se controla desde [`config/app_style.json`](config/app_style.
 | `table` | Fondos de filas pares/impares y colores del cursor de la tabla. |
 
 `src/utils/theme_loader.py` valida el JSON y lo traduce a TCSS en tiempo de
-arranque. Se puede usar una configuración alternativa sin tocar código:
+arranque. Además, `build_textual_theme()` registra la misma paleta como tema
+nativo de Textual (en versiones que lo soportan), de modo que el command
+palette, el panel de ayuda, las notificaciones y los scrollbars usan los mismos
+colores que la pantalla principal. El selector de temas de Textual se oculta
+para que la apariencia siga dependiendo únicamente de `app_style.json`.
+
+Se puede usar una configuración alternativa sin tocar código:
 
 ```python
 from src.utils.theme_loader import load_tcss_from_config
@@ -155,7 +161,7 @@ lum-tui/
 │   │   ├── screens.py        # MainScreen y modales
 │   │   └── widgets.py        # RetroHeader, LumFooter y UserTable
 │   └── utils/
-│       └── theme_loader.py   # JSON -> TCSS
+│       └── theme_loader.py   # JSON -> TCSS y tema nativo de Textual
 ├── requirements.txt
 └── README.md
 ```
