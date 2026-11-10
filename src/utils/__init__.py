@@ -1,4 +1,4 @@
-"""Utilidades de lum-tui."""
+"""Utilidades de lhdum."""
 
 from __future__ import annotations
 

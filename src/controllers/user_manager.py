@@ -1,4 +1,4 @@
-"""Capa de acceso al sistema Linux para ``lum-tui``.
+"""Capa de acceso al sistema Linux para ``lhdum``.
 
 Encapsula la lectura de usuarios/grupos mediante los módulos ``pwd`` y ``grp``,
 y la ejecución segura de ``useradd``/``userdel`` mediante ``subprocess``.
@@ -298,7 +298,7 @@ class SystemUserManager:
         if sudo is None:
             raise PrivilegeError(
                 "Se requieren privilegios de root o sudo para modificar usuarios. "
-                "Instala sudo o ejecuta lum-tui como root."
+                "Instala sudo o ejecuta lhdum como root."
             )
 
         try:
@@ -319,7 +319,7 @@ class SystemUserManager:
             suffix = f" Detalle: {detail}" if detail else ""
             raise PrivilegeError(
                 "Se requieren privilegios de root o sudo. Ejecuta 'sudo -v' antes "
-                "de arrancar lum-tui, configura sudo sin contraseña para tu "
+                "de arrancar lhdum, configura sudo sin contraseña para tu "
                 f"usuario, o lanza la aplicación como root.{suffix}"
             )
 
@@ -381,7 +381,7 @@ class SystemUserManager:
                 suffix = f" {stderr}" if stderr else ""
                 raise PrivilegeError(
                     "No se pudieron elevar privilegios para "
-                    f"{action}. Ejecuta 'sudo -v' antes de arrancar lum-tui.{suffix}"
+                    f"{action}. Ejecuta 'sudo -v' antes de arrancar lhdum.{suffix}"
                 ) from exc
 
             if "already exists" in lower or "ya existe" in lower:
@@ -553,7 +553,7 @@ class SystemUserManager:
         user = cls.get_user(username)
         if user["uid"] == os.geteuid():
             raise UserOperationError(
-                "No puedes eliminar la cuenta con la que estás ejecutando lum-tui."
+                "No puedes eliminar la cuenta con la que estás ejecutando lhdum."
             )
 
         command = ["userdel"]

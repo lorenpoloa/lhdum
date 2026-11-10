@@ -1,4 +1,4 @@
-"""Carga de estilos externos para ``lum-tui``.
+"""Carga de estilos externos para ``lhdum``.
 
 Este módulo es el único punto de entrada para la configuración visual de la
 aplicación. Lee ``config/app_style.json`` y genera una hoja TCSS (Textual CSS)
@@ -213,7 +213,7 @@ def build_textual_theme(config_path: str | Path | None = None) -> Any | None:
     table = config["table"]
 
     return Theme(
-        name=config.get("theme_name", "lum-tui"),
+        name=config.get("theme_name", "lhdum"),
         primary=palette["primary"],
         secondary=palette["secondary"],
         accent=palette["accent"],

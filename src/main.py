@@ -1,4 +1,4 @@
-"""Punto de entrada de lum-tui."""
+"""Punto de entrada de lhdum."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ def main() -> int:
     except ModuleNotFoundError as exc:
         if exc.name == "textual":
             print(
-                "lum-tui: falta la dependencia 'textual'. "
+                "lhdum: falta la dependencia 'textual'. "
                 "Instala las dependencias con: python -m pip install -r requirements.txt",
                 file=sys.stderr,
             )
@@ -24,7 +24,7 @@ def main() -> int:
     try:
         app = MainScreen()
     except (FileNotFoundError, ThemeConfigError) as exc:
-        print(f"lum-tui: error de configuración visual: {exc}", file=sys.stderr)
+        print(f"lhdum: error de configuración visual: {exc}", file=sys.stderr)
         return 2
 
     try:

@@ -1,4 +1,4 @@
-"""Vistas y componentes visuales de lum-tui."""
+"""Vistas y componentes visuales de lhdum."""
 
 from __future__ import annotations
 

@@ -1,10 +1,10 @@
-Proyecto: Linux User Manager TUI (lum-tui)
+Proyecto: Linux Hybrid Desktop Users Manager (lhdum)
 Este documento define la especificación técnica completa para implementar una herramienta de gestión de usuarios en Linux con interfaz de consola TUI, desarrollada en Python 3.10+ mediante el framework Textual.
 La arquitectura desacopla completamente la lógica del sistema, los widgets visuales y la configuración de estilos, permitiendo la integración futura con un tema global de escritorio mediante un archivo de configuración JSON local.
 1. Arquitectura General y Estructura de Archivos
 El proyecto seguirá un patrón MVC (Modelo-Vista-Controlador) estricto:
 Plaintext
-lum-tui/
+lhdum/
 ├── config/
 │   └── app_style.json       # Parámetros de estilo (simula la inyección del tema global)
 ├── src/

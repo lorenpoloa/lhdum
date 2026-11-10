@@ -1,4 +1,4 @@
-"""Widgets personalizados de lum-tui.
+"""Widgets personalizados de lhdum.
 
 La apariencia de todos los componentes proviene exclusivamente de
 :func:`src.utils.theme_loader.load_tcss_from_config`; aquí solo se define la
@@ -20,7 +20,7 @@ class RetroHeader(Header):
         super().__init__(show_clock=show_clock, **kwargs)
 
 
-class LumFooter(Footer):
+class LhdumFooter(Footer):
     """Footer estándar de Textual; los colores vienen del tema externo."""
 
 

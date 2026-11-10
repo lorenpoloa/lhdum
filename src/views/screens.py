@@ -1,4 +1,4 @@
-"""Pantallas y modales de lum-tui.
+"""Pantallas y modales de lhdum.
 
 ``MainScreen`` es la aplicación Textual principal. Los modales se encargan de
 recoger y validar la entrada del usuario; las operaciones reales sobre el
@@ -25,7 +25,7 @@ from src.controllers.user_manager import (
     UserValidationError,
 )
 from src.utils.theme_loader import build_textual_theme, load_tcss_from_config
-from src.views.widgets import LumFooter, RetroHeader, UserTable
+from src.views.widgets import LhdumFooter, RetroHeader, UserTable
 
 HELP_TEXT = """\
 [bold]F1[/bold] / [bold]?[/bold]        Ayuda y atajos
@@ -41,7 +41,7 @@ El panel inferior muestra los detalles del usuario bajo el cursor.\
 """
 
 PRIVILEGE_TEXT = """\
-lum-tui puede leer los usuarios del sistema, pero no crear ni eliminar
+lhdum puede leer los usuarios del sistema, pero no crear ni eliminar
 cuentas porque el proceso no se ejecuta como root y sudo no tiene
 credenciales cacheadas.
 
@@ -344,10 +344,10 @@ class PrivilegeAlertModal(ModalScreen[str]):
 
 
 class MainScreen(App):
-    """Aplicación principal de lum-tui."""
+    """Aplicación principal de lhdum."""
 
-    TITLE = "lum-tui"
-    SUB_TITLE = "Linux User Manager"
+    TITLE = "lhdum"
+    SUB_TITLE = "Linux Hybrid Desktop Users Manager"
 
     BINDINGS = [
         Binding("f1", "help", "Ayuda"),
@@ -405,7 +405,7 @@ class MainScreen(App):
                 id="detail_content",
             )
 
-        yield LumFooter()
+        yield LhdumFooter()
 
     def on_mount(self) -> None:
         self._privileged = SystemUserManager.has_privileges()
@@ -620,7 +620,7 @@ class MainScreen(App):
 
         self.notify(
             "La aplicación está en modo solo lectura. Ejecuta 'sudo -v' y "
-            "reinicia lum-tui para poder modificar usuarios.",
+            "reinicia lhdum para poder modificar usuarios.",
             title="Privilegios insuficientes",
             severity="warning",
             timeout=8,
@@ -662,7 +662,7 @@ class MainScreen(App):
             self._set_privileged(True)
             self.notify(
                 "Privilegios verificados. Modo administrador activo.",
-                title="lum-tui",
+                title="lhdum",
                 severity="information",
                 timeout=5,
             )
@@ -671,7 +671,7 @@ class MainScreen(App):
         self._set_privileged(False)
         self.notify(
             "Continuando en modo solo lectura.",
-            title="lum-tui",
+            title="lhdum",
             severity="warning",
             timeout=5,
         )

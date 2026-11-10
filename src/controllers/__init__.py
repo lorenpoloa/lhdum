@@ -1,4 +1,4 @@
-"""Controladores de lum-tui (acceso al sistema y lógica de negocio)."""
+"""Controladores de lhdum (acceso al sistema y lógica de negocio)."""
 
 from __future__ import annotations
 

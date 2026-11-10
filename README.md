@@ -1,4 +1,4 @@
-# lum-tui — Linux User Manager TUI
+# lhdum — Linux Hybrid Desktop Users Manager
 
 Herramienta de consola para administrar usuarios locales de Linux desde una
 interfaz TUI construida con [Textual](https://textual.textualize.io/). El
@@ -43,8 +43,8 @@ La especificación técnica completa está en
 ## Instalación
 
 ```bash
-git clone <url-del-repositorio> LHD-UsersAdmin
-cd LHD-UsersAdmin
+git clone https://github.com/lorenpoloa/lhdum.git
+cd lhdum
 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -82,7 +82,7 @@ una regla `NOPASSWD`, aparece un modal de aviso con tres opciones:
 - **Salir**: cierra la aplicación.
 
 > Ejecutar la TUI completa como root funciona, pero no es el modo recomendado:
-> es preferible `sudo -v` y arrancar `lum-tui` con el usuario normal.
+> es preferible `sudo -v` y arrancar `lhdum` con el usuario normal.
 
 La interfaz está pensada para terminales de al menos **80×24**; los modales se
 adaptan y hacen scroll si la altura es menor.
@@ -145,7 +145,7 @@ El proyecto sigue un MVC estricto: el sistema, la lógica y la interfaz están
 desacoplados.
 
 ```text
-lum-tui/
+lhdum/
 ├── config/
 │   └── app_style.json        # Paleta y parámetros visuales externos
 ├── docs/
@@ -159,7 +159,7 @@ lum-tui/
 │   │   └── user_manager.py   # Backend Linux: pwd/grp/useradd/usermod/userdel
 │   ├── views/
 │   │   ├── screens.py        # MainScreen y modales
-│   │   └── widgets.py        # RetroHeader, LumFooter y UserTable
+│   │   └── widgets.py        # RetroHeader, LhdumFooter y UserTable
 │   └── utils/
 │       └── theme_loader.py   # JSON -> TCSS y tema nativo de Textual
 ├── requirements.txt
@@ -188,7 +188,7 @@ Errores tipados: `UserValidationError`, `UserNotFoundError`,
 
 - `MainScreen`: aplicación Textual con cabecera, barra de acciones, tabla,
   panel de detalle y footer.
-- `RetroHeader`, `LumFooter` y `UserTable`: widgets reutilizables.
+- `RetroHeader`, `LhdumFooter` y `UserTable`: widgets reutilizables.
 - `CreateUserModal`: nombre, shell, grupos secundarios y creación de home.
 - `EditUserModal`: shell y grupos secundarios.
 - `ConfirmDeleteModal`: confirmación y borrado opcional del home.

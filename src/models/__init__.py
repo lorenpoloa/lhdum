@@ -1,4 +1,4 @@
-"""Modelos de datos de lum-tui."""
+"""Modelos de datos de lhdum."""
 
 from __future__ import annotations
 
