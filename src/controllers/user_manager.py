@@ -183,6 +183,17 @@ class SystemUserManager:
                 groups.append(str(gid))
         return groups
 
+    @classmethod
+    def get_supplementary_groups(cls, username: str) -> list[str]:
+        """Devuelve solo los grupos secundarios, sin el grupo primario."""
+
+        user = cls.get_user(username)
+        return [
+            group
+            for group in cls.get_user_groups(username)
+            if group != user["group"]
+        ]
+
     @staticmethod
     def get_available_shells() -> list[str]:
         """Devuelve las shells válidas para el selector del formulario."""
@@ -214,9 +225,7 @@ class SystemUserManager:
             )
         if not USERNAME_PATTERN.fullmatch(username):
             raise UserValidationError(
-                "Nombre de usuario inválido: debe empezar por letra minúscula o "
-                "guion bajo y contener solo minúsculas, dígitos, guiones o "
-                "guiones bajos (opcionalmente terminado en '$')."
+                "Inválido: a-z, 0-9, '-', '_'; inicia con letra o '_'."
             )
 
     @staticmethod
@@ -258,7 +267,7 @@ class SystemUserManager:
                 continue
             if len(group) > MAX_NAME_LENGTH or not GROUP_PATTERN.fullmatch(group):
                 raise UserValidationError(
-                    f"Nombre de grupo inválido: '{group}'."
+                    f"Grupo inválido: '{group}'."
                 )
             if group not in normalized:
                 normalized.append(group)
@@ -382,7 +391,7 @@ class SystemUserManager:
 
             if "does not exist" in lower or "no existe" in lower:
                 raise UserNotFoundError(
-                    f"El usuario no existe: {stderr}"
+                    f"El usuario o grupo indicado no existe: {stderr}"
                 ) from exc
 
             raise UserOperationError(
@@ -446,6 +455,68 @@ class SystemUserManager:
         cls._run_privileged(
             command,
             action=f"crear el usuario '{username}'",
+        )
+        return True
+
+    @classmethod
+    def modify_user(
+        cls,
+        username: str,
+        shell: str | None = None,
+        groups: Iterable[str] | None = None,
+    ) -> bool:
+        """Modifica la shell y/o los grupos secundarios con ``usermod``.
+
+        Args:
+            username: Nombre del usuario.
+            shell: Nueva shell de login, o ``None`` para no cambiarla.
+            groups: Nueva lista de grupos secundarios, o ``None`` para no
+                cambiarlos. Una lista vacía elimina todos los grupos
+                secundarios.
+
+        Returns:
+            ``True`` si la modificación se aplicó correctamente.
+
+        Raises:
+            UserValidationError: Si no hay cambios o algún dato es inválido.
+            UserNotFoundError: Si el usuario no existe.
+            UserOperationError: Si se intenta modificar una cuenta protegida.
+            PrivilegeError: Si no hay privilegios suficientes.
+            UserOperationError: Si ``usermod`` falla.
+        """
+
+        username = username.strip()
+        cls.validate_username(username)
+
+        if username in PROTECTED_USERS:
+            raise UserOperationError(
+                f"La cuenta '{username}' está protegida y no se puede modificar."
+            )
+
+        cls.get_user(username)
+
+        command = ["usermod"]
+        has_changes = False
+
+        if shell is not None:
+            cls.validate_shell(shell)
+            command.extend(["-s", shell])
+            has_changes = True
+
+        if groups is not None:
+            normalized_groups = cls.validate_groups(groups)
+            # ``-G ""`` elimina todos los grupos secundarios.
+            command.extend(["-G", ",".join(normalized_groups)])
+            has_changes = True
+
+        if not has_changes:
+            raise UserValidationError("No se indicó ningún cambio para el usuario.")
+
+        command.append(username)
+
+        cls._run_privileged(
+            command,
+            action=f"modificar el usuario '{username}'",
         )
         return True
 

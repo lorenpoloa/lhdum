@@ -9,30 +9,35 @@ usuarios ejecutadas de forma segura.
 La especificación técnica completa está en
 [`docs/LHD-UsersAdmin.md`](docs/LHD-UsersAdmin.md).
 
-> **Estado actual — Fase 1 (base del proyecto).**
-> Están implementados la estructura MVC, la configuración visual externa, el
-> cargador de temas TCSS y la capa de sistema (`pwd`, `grp`, `useradd`,
-> `userdel`). La pantalla principal, los widgets y los modales se implementarán
-> en la siguiente fase (ver [Roadmap](#roadmap)).
+> **Estado actual.** La aplicación está funcional: estructura MVC, tema externo,
+> backend Linux, pantalla principal, búsqueda, panel de detalle y modales de
+> alta, edición, eliminación y ayuda. La pantalla de aviso de privilegios
+> permite continuar en modo solo lectura. Quedan pendientes las pruebas
+> automatizadas.
 
-## Características previstas
+## Características
 
 - Listado de usuarios locales leído desde `pwd` y `grp`, ordenado por UID.
-- Tabla densa estilo `htop` con cursor por filas y soporte de *zebra stripes*.
-- Búsqueda rápida por nombre de usuario o UID.
-- Panel inferior con información ampliada del usuario seleccionado.
-- Alta de usuarios mediante `useradd` y baja mediante `userdel`.
+- Tabla densa estilo `htop` con cursor por filas y *zebra stripes*.
+- Búsqueda incremental por usuario, UID, grupo, home o shell.
+- Panel inferior con UID/GID, grupo, home, shell, grupos y tipo de cuenta.
+- Alta de usuarios mediante `useradd`.
+- Edición de shell y grupos secundarios mediante `usermod`.
+- Baja de usuarios mediante `userdel`, con opción de borrar el home (`-r`).
 - Atajos de teclado tipo `htop`/OpenCode (`F1`–`F5`, `/`, `q`, `Esc`).
 - Tema visual externalizado: ningún color, borde o margen está codificado en
   los widgets; todo se genera desde `config/app_style.json`.
-- Mensajes de error amigables en la TUI, sin trazas de pila, cuando faltan
-  privilegios.
+- Aviso amigable en la TUI cuando faltan privilegios, con opción de reintentar
+  (`sudo -v`), continuar en modo solo lectura o salir.
+- Validación POSIX de nombres de usuario y grupos antes de tocar el sistema.
 
 ## Stack
 
 - Python 3.10+
-- [Textual](https://textual.textualize.io/) (`>=0.40.0`)
-- Utilidades estándar de Linux: `pwd`, `grp`, `subprocess`, `useradd`, `userdel`
+- [Textual](https://textual.textualize.io/) (`>=0.40.0`; probado con `0.40.0`
+  y `8.2.8`)
+- Utilidades estándar de Linux: `pwd`, `grp`, `subprocess`, `useradd`,
+  `usermod`, `userdel`
 - `sudo` para elevación de privilegios (o ejecución directa como root)
 
 ## Instalación
@@ -52,9 +57,9 @@ python -m pip install -r requirements.txt
 
 ## Ejecución
 
-La aplicación necesita privilegios para crear o eliminar usuarios, pero no para
-leerlos. El modo recomendado es cachear la credencial de `sudo` y ejecutar la
-TUI como usuario normal:
+La aplicación necesita privilegios para crear, editar o eliminar usuarios, pero
+no para leerlos. El modo recomendado es cachear la credencial de `sudo` y
+ejecutar la TUI como usuario normal:
 
 ```bash
 sudo -v          # cachea la contraseña de sudo
@@ -69,12 +74,33 @@ sudo -E .venv/bin/python -m src.main
 
 El backend usa `sudo -n` (no interactivo) para que la TUI nunca se quede
 bloqueada esperando una contraseña. Si `sudo` no tiene credenciales cacheadas ni
-una regla `NOPASSWD`, la aplicación mostrará un aviso de privilegios en lugar de
-fallar con un *stack trace*.
+una regla `NOPASSWD`, aparece un modal de aviso con tres opciones:
 
-> La entrada `src/main.py` y las vistas todavía son marcadores de posición: se
-> completarán en la fase 2. Mientras tanto, el backend y el cargador de temas
-> pueden probarse de forma independiente.
+- **Reintentar**: vuelve a comprobar los privilegios (útil tras `sudo -v`).
+- **Solo lectura**: permite consultar y buscar usuarios, pero deshabilita las
+  acciones de escritura.
+- **Salir**: cierra la aplicación.
+
+> Ejecutar la TUI completa como root funciona, pero no es el modo recomendado:
+> es preferible `sudo -v` y arrancar `lum-tui` con el usuario normal.
+
+La interfaz está pensada para terminales de al menos **80×24**; los modales se
+adaptan y hacen scroll si la altura es menor.
+
+## Atajos de teclado
+
+| Tecla | Acción |
+| --- | --- |
+| `F1` / `?` | Ayuda y lista de atajos |
+| `F2` / `a` | Nuevo usuario |
+| `F3` / `e` | Editar usuario seleccionado |
+| `F4` / `d` | Eliminar usuario seleccionado (con confirmación) |
+| `F5` / `r` | Recargar lista |
+| `/` / `Ctrl+F` | Enfocar búsqueda rápida |
+| `q` / `Esc` | Salir |
+
+La búsqueda filtra en vivo por usuario, UID, grupo, home y shell. El panel
+inferior se actualiza al mover el cursor por la tabla.
 
 ## Configuración visual
 
@@ -120,14 +146,14 @@ lum-tui/
 │   └── LHD-UsersAdmin.md     # Especificación técnica
 ├── src/
 │   ├── __init__.py
-│   ├── main.py               # Punto de entrada (fase 2)
+│   ├── main.py               # Punto de entrada
 │   ├── models/
-│   │   └── sys_user.py       # Modelo de usuario (fase 2)
+│   │   └── sys_user.py       # Modelo de usuario (ampliación futura)
 │   ├── controllers/
-│   │   └── user_manager.py   # Backend Linux: pwd/grp/useradd/userdel
+│   │   └── user_manager.py   # Backend Linux: pwd/grp/useradd/usermod/userdel
 │   ├── views/
-│   │   ├── screens.py        # MainScreen y modales (fase 2)
-│   │   └── widgets.py        # Header, Footer, UserTable (fase 2)
+│   │   ├── screens.py        # MainScreen y modales
+│   │   └── widgets.py        # RetroHeader, LumFooter y UserTable
 │   └── utils/
 │       └── theme_loader.py   # JSON -> TCSS
 ├── requirements.txt
@@ -141,14 +167,27 @@ lum-tui/
 - `get_all_users(include_system=True)`: lista usuarios desde `pwd`, resuelve el
   grupo primario con `grp` y marca las cuentas de sistema.
 - `get_user(username)`, `user_exists(username)` y `get_user_groups(username)`.
+- `get_supplementary_groups(username)`: grupos secundarios sin el primario.
 - `get_available_shells()`: shells para el selector del formulario.
 - `create_user(...)`: ejecuta `useradd` con argumentos validados.
+- `modify_user(username, shell=None, groups=None)`: ejecuta `usermod`.
 - `delete_user(username, remove_home=False)`: ejecuta `userdel`; protege `root`
   y la cuenta desde la que se ejecuta la aplicación.
 - `check_privileges()` / `has_privileges()`: comprobación previa de root o sudo.
 
 Errores tipados: `UserValidationError`, `UserNotFoundError`,
 `UserAlreadyExistsError`, `PrivilegeError` y `UserOperationError`.
+
+### Interfaz (`src/views/`)
+
+- `MainScreen`: aplicación Textual con cabecera, barra de acciones, tabla,
+  panel de detalle y footer.
+- `RetroHeader`, `LumFooter` y `UserTable`: widgets reutilizables.
+- `CreateUserModal`: nombre, shell, grupos secundarios y creación de home.
+- `EditUserModal`: shell y grupos secundarios.
+- `ConfirmDeleteModal`: confirmación y borrado opcional del home.
+- `HelpModal`: ayuda con los atajos.
+- `PrivilegeAlertModal`: aviso de privilegios con reintento y modo solo lectura.
 
 ## Seguridad
 
@@ -158,40 +197,32 @@ Errores tipados: `UserValidationError`, `UserNotFoundError`,
   `^[a-z_][a-z0-9_-]*\$?$`, con límite de 32 caracteres.
 - **Validación de rutas** de shell y home antes de invocar `useradd`.
 - **`sudo -n`**: nunca se solicita contraseña dentro de la TUI.
-- **Cuentas protegidas**: no se puede eliminar `root` ni el usuario actual.
-- **Errores controlados**: los fallos de `sudo`/`useradd`/`userdel` se traducen
-  a excepciones de dominio con mensajes claros.
-
-## Atajos de teclado (fase 2)
-
-| Tecla | Acción |
-| --- | --- |
-| `F1` / `?` | Ayuda y lista de atajos |
-| `F2` / `a` | Nuevo usuario |
-| `F3` / `e` | Editar usuario |
-| `F4` / `d` | Eliminar usuario (con confirmación) |
-| `F5` / `r` | Recargar lista |
-| `/` / `Ctrl+F` | Enfocar búsqueda rápida |
-| `q` / `Esc` | Salir |
+- **Cuentas protegidas**: no se puede eliminar `root` ni el usuario actual, y
+  `root` tampoco se modifica desde la interfaz.
+- **Errores controlados**: los fallos de `sudo`/`useradd`/`usermod`/`userdel` se
+  traducen a excepciones de dominio con mensajes claros.
+- **Modo solo lectura** cuando no hay privilegios, sin trazas de pila.
 
 ## Roadmap
 
 - [x] Estructura MVC y `requirements.txt`.
 - [x] `config/app_style.json` y `src/utils/theme_loader.py`.
 - [x] `SystemUserManager` con lectura y operaciones seguras.
-- [ ] `src/models/sys_user.py`: modelo de datos enriquecido.
-- [ ] `src/views/widgets.py`: cabecera retro, footer y tabla de usuarios.
-- [ ] `src/views/screens.py`: `MainScreen`, panel de detalle y modales
-      (`CreateUserModal`, `EditUserModal`, `ConfirmDeleteModal`, `HelpModal`).
-- [ ] `src/main.py`: arranque de la `App`, alerta de privilegios y cableado.
-- [ ] Validación POSIX en formularios y pantalla de aviso sin privilegios.
-- [ ] Pruebas del backend con `unittest`/`pytest`.
+- [x] `src/views/widgets.py`: cabecera retro, footer y tabla de usuarios.
+- [x] `src/views/screens.py`: `MainScreen`, panel de detalle y modales.
+- [x] `src/main.py`: arranque de la `App`, alerta de privilegios y cableado.
+- [x] Validación POSIX en formularios y pantalla de aviso sin privilegios.
+- [ ] `src/models/sys_user.py`: modelo de datos tipado para futuras vistas.
+- [ ] Pruebas automatizadas del backend y de los formularios.
 
 ## Desarrollo
 
 ```bash
 # Comprobar que todos los módulos compilan
 python -m compileall -q src
+
+# Arrancar la aplicación
+python -m src.main
 
 # Listar usuarios desde el backend
 python - <<'PY'

@@ -212,12 +212,15 @@ Footer {{
 
 #action_bar {{
     height: 3;
+    layout: horizontal;
+    align-vertical: middle;
     background: {p["surface"]};
     border-bottom: {b["type"]} {p["border"]};
     padding: 0 1;
 }}
 
 #search_input {{
+    width: 1fr;
     background: {p["surface_focus"]};
     color: {p["text"]};
     border: {b["type"]} {p["border"]};
@@ -227,10 +230,19 @@ Footer {{
     border: {b["type"]} {p["border_focus"]};
 }}
 
+#action_bar Button {{
+    min-width: 12;
+    margin-left: 1;
+}}
+
 DataTable {{
     background: {p["background"]};
     color: {p["text"]};
     border: {b["type"]} {p["border"]};
+}}
+
+#user_table {{
+    height: 1fr;
 }}
 
 DataTable > .datatable--header {{
@@ -263,11 +275,13 @@ DataTable:focus > .datatable--cursor {{
 }}
 
 #detail_title {{
+    height: 1;
     color: {p["secondary"]};
     text-style: bold;
 }}
 
 #detail_content {{
+    height: 1fr;
     color: {p["text"]};
 }}
 
@@ -281,6 +295,31 @@ Input:focus {{
     border: {b["type"]} {p["border_focus"]};
 }}
 
+Input:disabled {{
+    background: {p["surface"]};
+    color: {p["text_muted"]};
+    border: {b["type"]} {p["border"]};
+}}
+
+Input > .input--placeholder {{
+    color: {p["text_muted"]};
+}}
+
+Select {{
+    background: {p["surface_focus"]};
+    color: {p["text"]};
+    border: {b["type"]} {p["border"]};
+}}
+
+Select:focus {{
+    border: {b["type"]} {p["border_focus"]};
+}}
+
+Checkbox {{
+    background: transparent;
+    color: {p["text"]};
+}}
+
 Button {{
     background: {p["surface_focus"]};
     color: {p["text"]};
@@ -290,6 +329,12 @@ Button {{
 Button:hover {{
     background: {p["primary"]};
     color: {p["background"]};
+}}
+
+Button:disabled {{
+    background: {p["surface"]};
+    color: {p["text_muted"]};
+    border: {b["type"]} {p["border"]};
 }}
 
 Button.-success {{
@@ -308,10 +353,60 @@ ModalScreen {{
 }}
 
 #dialog {{
-    width: 60;
+    width: 66;
+    max-height: 100%;
     height: auto;
     background: {p["surface"]};
     border: {b["type"]} {p["border_focus"]};
-    padding: 1 2;
+    padding: 0 2;
+    overflow-y: auto;
+}}
+
+.dialog_title {{
+    height: 1;
+    color: {p["primary"]};
+    text-style: bold;
+}}
+
+.dialog_text {{
+    height: auto;
+    color: {p["text"]};
+    margin-bottom: 1;
+}}
+
+.field_label {{
+    height: 1;
+    color: {p["text_muted"]};
+}}
+
+#dialog Input,
+#dialog Select {{
+    width: 100%;
+}}
+
+#dialog_buttons {{
+    height: 3;
+    align-horizontal: right;
+}}
+
+#dialog_buttons Button {{
+    min-width: 12;
+    margin-left: 1;
+}}
+
+#form_error {{
+    height: auto;
+    color: {p["error"]};
+    margin-top: 1;
+}}
+
+#alert_message {{
+    height: auto;
+    color: {p["text"]};
+}}
+
+#help_text {{
+    height: auto;
+    color: {p["text"]};
 }}
 """
