@@ -362,6 +362,7 @@ class MainScreen(App):
         Binding("r", "refresh", "Recargar", show=False),
         Binding("slash", "focus_search", "Buscar", show=False),
         Binding("ctrl+f", "focus_search", "Buscar", show=False),
+        Binding("ctrl+p", "command_palette", "Menú", show=False, priority=True),
         Binding("q", "quit", "Salir"),
         Binding("escape", "quit", "Salir", show=False),
     ]
